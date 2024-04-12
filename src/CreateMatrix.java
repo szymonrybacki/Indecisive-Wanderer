@@ -1,71 +1,56 @@
-import java.util.ArrayList;
+import java.util.*;
 
 public class CreateMatrix {
-    public static ArrayList<String> createInitMatrix (){
-        int inputLines = 4;
-        ArrayList<ArrayList<Integer>> input = new ArrayList<>();
-        ArrayList<Integer> line1 = new ArrayList<>();
-        line1.add(1);
-        line1.add(2);
-        line1.add(4);
-        ArrayList<Integer> line2 = new ArrayList<>();
-        line2.add(2);
-        line2.add(3);
-        line2.add(4);
-        ArrayList<Integer> line3 = new ArrayList<>();
-        line3.add(3);
-        line3.add(4);
-        line3.add(4);
-        ArrayList<Integer> line4 = new ArrayList<>();
-        line4.add(4);
-        line4.add(1);
-        line4.add(4);
-        ArrayList<Integer> line5 = new ArrayList<>();
-        line5.add(1);
-        line5.add(3);
-        line5.add(6);
-        input.add(line1);
-        input.add(line2);
-        input.add(line3);
-        input.add(line4);
-        input.add(line5);
-
-        // Powyzej to testowe dane
-
-
-        //Tworzenie macierzy pomocniczej
-        ArrayList<String> helper = new ArrayList<>();
-
-        for(int i = 1; i <= inputLines; i++){
-            helper.add(Integer.toString(i));
-        }
-        for (ArrayList<Integer> row : input) {
-            for(int i = 1; i <= row.get(2) - 1; i++){
-                String point = Integer.toString(row.get(0)).concat(".").concat(Integer.toString(row.get(1)).concat(".")).concat(Integer.toString(i));
-                helper.add(point);
-            }
-        }
+    public static ArrayList<ArrayList<String>> createMatrix(ArrayList<String> helper, ArrayList<ArrayList<Integer>> input) {
+        ArrayList<ArrayList<String>> connections = new ArrayList<>();
 
         for (String point : helper) {
-            System.out.print(point + " ");
-        }
-
-        //Tworzenie macierzy polaczen
-        ArrayList<Object> connections = new ArrayList<>();
-        int index;
-        for (String point : helper) {
-            connections.add(new ArrayList<String>());
-            if(!point.contains(".")){
+            ArrayList<String> connection = new ArrayList<>();
+            if (!point.contains(".")) {
                 for (ArrayList<Integer> line : input) {
-                    index = line.indexOf(Integer.valueOf(point));
-                    if(index == 0){
-                    }else if(index == 1){
-
+                    int index = line.indexOf(Integer.valueOf(point));
+                    if (index == 0) {
+                        if (line.get(2) == 1) {
+                            connection.add(Integer.toString(line.get(1)));
+                        } else {
+                            connection.add(point + "." + line.get(1) + ".1");
+                        }
+                    } else if (index == 1) {
+                        if (line.get(2) == 1) {
+                            connection.add(Integer.toString(line.get(0)));
+                        } else {
+                            connection.add(point + "." + line.get(0) + "." + (line.get(2) - 1));
+                        }
                     }
                 }
+            } else {
+                String[] parts = point.split("\\.");
+                int crossroad1 = Integer.parseInt(parts[0]);
+                int crossroad2 = Integer.parseInt(parts[1]);
+                int position = Integer.parseInt(parts[2]);
+                if (position > 1) {
+                    connection.add(crossroad1 + "." + crossroad2 + "." + (position - 1));
+                } else {
+                    connection.add(Integer.toString(crossroad1));
+                }
+                if (position < getLength(input, crossroad1, crossroad2)) {
+                    connection.add(crossroad1 + "." + crossroad2 + "." + (position + 1));
+                } else {
+                    connection.add(Integer.toString(crossroad2));
+                }
             }
+            connections.add(connection);
         }
 
-        return helper;
+        return connections;
+    }
+
+    private static int getLength(ArrayList<ArrayList<Integer>> input, int crossroad1, int crossroad2) {
+        for (ArrayList<Integer> line : input) {
+            if ((line.get(0) == crossroad1 && line.get(1) == crossroad2) || (line.get(0) == crossroad2 && line.get(1) == crossroad1)) {
+                return line.get(2);
+            }
+        }
+        return 0;
     }
 }
